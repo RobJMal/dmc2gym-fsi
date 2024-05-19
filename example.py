@@ -29,8 +29,8 @@ if __name__ == '__main__':
     seed = 42
     visualize_reward = False
     from_pixels = True
-    height = 64
-    width = 64
+    height = 64 # Shape of a single image in the frame 
+    width = 64  # Shape of a single image in the frame
     frame_skip = 2
     pixel_norm = True
 

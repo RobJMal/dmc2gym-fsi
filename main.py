@@ -12,7 +12,6 @@ os.environ['MUJOCO_EGL_DEVICE_ID'] = '0'    # Connecting to GPU
 import dmc2gym
 import matplotlib.pyplot as plt
 import numpy as np 
-from PIL import Image
 
 # Custom libraries 
 from visualization import save_video
@@ -47,7 +46,7 @@ if __name__ == '__main__':
     )
     pixels = env.physics.render()
 
-    duration = 4
+    duration = 10
     frames = []
     ticks = []
     rewards = []
@@ -60,16 +59,7 @@ if __name__ == '__main__':
         action = random_state.uniform(spec.minimum, spec.maximum, spec.shape)
         obs, reward, done, extra = env.step(action)
 
-        obs = np.transpose(obs, (1, 2, 0))
-        obs_image = Image.fromarray(obs)
-        obs_image.save("test1.png")
-        breakpoint()
-
-        # Frames of the agent in the environment (for visualization purposes)
-        # camera0 = env.physics.render(camera_id=0, height=200, width=200)
-        # camera1 = env.physics.render(camera_id=1, height=200, width=200)
-        frames.append(np.hstack((camera0, camera1)))
-        # breakpoint()
+        frames.append(obs)
         rewards.append(reward)
         observations.append(copy.deepcopy(obs))
         ticks.append(env.physics.data.time)

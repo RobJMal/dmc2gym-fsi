@@ -102,11 +102,11 @@ class DMCWrapper(core.Env):
 
     def _get_obs(self, time_step):
         if self._from_pixels:
-            obs = self.render(
-                height=self._height,
-                width=self._width,
-                camera_id=self._camera_id
-            )
+            # obs = self.render(
+            #     height=self._height,
+            #     width=self._width,
+            #     camera_id=self._camera_id
+            # )
 
             # 4 cameras for DMC fish domain 
             obs0 = self.render(height=self._height, width=self._width, camera_id=0)

@@ -56,6 +56,8 @@ class DMCWrapper(core.Env):
         self._camera_id = camera_id
         self._frame_skip = frame_skip
         self._channels_first = channels_first
+        self._domain_name = domain_name
+        self._task_name = task_name
 
         # create task
         self._env = suite.load(
@@ -102,11 +104,28 @@ class DMCWrapper(core.Env):
 
     def _get_obs(self, time_step):
         if self._from_pixels:
+            # 4 cameras for DMC fish domain 
+            if self._domain_name == "fish" and self._task_name == "swim": 
+                obs0 = self.render(height=self._height, width=self._width, camera_id=0)
+                obs1 = self.render(height=self._height, width=self._width, camera_id=1)
+                obs2 = self.render(height=self._height, width=self._width, camera_id=2)
+                obs3 = self.render(height=self._height, width=self._width, camera_id=3)
+
+                top_row = np.concatenate((obs0, obs1), axis=1)
+                bottom_row = np.concatenate((obs2, obs3), axis=1)
+                grid_obs = np.concatenate((top_row, bottom_row), axis=0)
+
+                if self._channels_first:
+                    grid_obs = grid_obs.transpose(2, 0, 1).copy()
+
+                return grid_obs
+            
             obs = self.render(
                 height=self._height,
                 width=self._width,
                 camera_id=self._camera_id
             )
+
             if self._channels_first:
                 obs = obs.transpose(2, 0, 1).copy()
         else:

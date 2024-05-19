@@ -9,7 +9,7 @@ os.environ['MUJOCO_GL'] = 'egl'
 os.environ['MUJOCO_EGL_DEVICE_ID'] = '0'    # Connecting to GPU
 
 # Main imports 
-import dmc2gym
+import dmc2gym_fsi 
 import matplotlib.pyplot as plt
 import numpy as np 
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     frame_skip = 2
     pixel_norm = True
 
-    env = dmc2gym.make(
+    env = dmc2gym_fsi.make(
         domain_name=domain_name,
         task_name=task_name,
         seed=seed,
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     )
     pixels = env.physics.render()
 
-    duration = 4
+    duration = 10
     frames = []
     ticks = []
     rewards = []
@@ -59,11 +59,7 @@ if __name__ == '__main__':
         action = random_state.uniform(spec.minimum, spec.maximum, spec.shape)
         obs, reward, done, extra = env.step(action)
 
-        # Frames of the agent in the environment (for visualization purposes)
-        camera0 = env.physics.render(camera_id=0, height=200, width=200)
-        camera1 = env.physics.render(camera_id=1, height=200, width=200)
-        frames.append(np.hstack((camera0, camera1)))
-        # breakpoint()
+        frames.append(obs)
         rewards.append(reward)
         observations.append(copy.deepcopy(obs))
         ticks.append(env.physics.data.time)

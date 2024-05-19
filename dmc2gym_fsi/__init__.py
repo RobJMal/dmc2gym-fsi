@@ -33,7 +33,7 @@ def make(
             task_kwargs['time_limit'] = time_limit
         register(
             id=env_id,
-            entry_point='dmc2gym.wrappers:DMCWrapper',
+            entry_point='dmc2gym_fsi.wrappers:DMCWrapper',  # Note changes here for library name clarity
             kwargs=dict(
                 domain_name=domain_name,
                 task_name=task_name,

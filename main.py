@@ -9,7 +9,7 @@ os.environ['MUJOCO_GL'] = 'egl'
 os.environ['MUJOCO_EGL_DEVICE_ID'] = '0'    # Connecting to GPU
 
 # Main imports 
-import dmc2gym
+import dmc2gym_fsi 
 import matplotlib.pyplot as plt
 import numpy as np 
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     frame_skip = 2
     pixel_norm = True
 
-    env = dmc2gym.make(
+    env = dmc2gym_fsi.make(
         domain_name=domain_name,
         task_name=task_name,
         seed=seed,

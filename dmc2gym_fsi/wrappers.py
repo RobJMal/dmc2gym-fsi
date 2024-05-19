@@ -79,6 +79,12 @@ class DMCWrapper(core.Env):
 
         # create observation space
         if from_pixels:
+            
+            # Multiplying by two since creating a grid of frames for fish-swim task
+            if self._domain_name == "fish" and self._task_name == "swim":
+                height*=2
+                width*=2
+            
             shape = [3, height, width] if channels_first else [height, width, 3]
             self._observation_space = spaces.Box(
                 low=0, high=255, shape=shape, dtype=np.uint8

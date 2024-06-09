@@ -109,34 +109,63 @@ class DMCWrapper(core.Env):
         return getattr(self._env, name)
 
     def _get_obs(self, time_step):
-        if self._from_pixels:
-            # 4 cameras for DMC fish domain 
-            if self._domain_name == "fish" and self._task_name == "swim": 
-                obs0 = self.render(height=self._height, width=self._width, camera_id=0)
-                obs1 = self.render(height=self._height, width=self._width, camera_id=1)
-                obs2 = self.render(height=self._height, width=self._width, camera_id=2)
-                obs3 = self.render(height=self._height, width=self._width, camera_id=3)
+        # Returning both pixels and state space 
+        # 4 cameras for DMC fish domain 
+        if self._domain_name == "fish" and self._task_name == "swim": 
+            obs0 = self.render(height=self._height, width=self._width, camera_id=0)
+            obs1 = self.render(height=self._height, width=self._width, camera_id=1)
+            obs2 = self.render(height=self._height, width=self._width, camera_id=2)
+            obs3 = self.render(height=self._height, width=self._width, camera_id=3)
 
-                top_row = np.concatenate((obs0, obs1), axis=1)
-                bottom_row = np.concatenate((obs2, obs3), axis=1)
-                grid_obs = np.concatenate((top_row, bottom_row), axis=0)
-
-                if self._channels_first:
-                    grid_obs = grid_obs.transpose(2, 0, 1).copy()
-
-                return grid_obs
-            
-            obs = self.render(
-                height=self._height,
-                width=self._width,
-                camera_id=self._camera_id
-            )
+            top_row = np.concatenate((obs0, obs1), axis=1)
+            bottom_row = np.concatenate((obs2, obs3), axis=1)
+            image_obs = np.concatenate((top_row, bottom_row), axis=0)
 
             if self._channels_first:
-                obs = obs.transpose(2, 0, 1).copy()
-        else:
-            obs = _flatten_obs(time_step.observation)
-        return obs
+                image_obs = image_obs.transpose(2, 0, 1).copy()
+        
+        proprio_obs = _flatten_obs(time_step.observation)
+
+        return proprio_obs, image_obs
+
+        # obs = self.render(
+        #         height=self._height,
+        #         width=self._width,
+        #         camera_id=self._camera_id
+        #     )
+
+        # if self._channels_first:
+        #     obs = obs.transpose(2, 0, 1).copy()
+
+        # # Original code 
+        # if self._from_pixels:
+        #     # 4 cameras for DMC fish domain 
+        #     if self._domain_name == "fish" and self._task_name == "swim": 
+        #         obs0 = self.render(height=self._height, width=self._width, camera_id=0)
+        #         obs1 = self.render(height=self._height, width=self._width, camera_id=1)
+        #         obs2 = self.render(height=self._height, width=self._width, camera_id=2)
+        #         obs3 = self.render(height=self._height, width=self._width, camera_id=3)
+
+        #         top_row = np.concatenate((obs0, obs1), axis=1)
+        #         bottom_row = np.concatenate((obs2, obs3), axis=1)
+        #         grid_obs = np.concatenate((top_row, bottom_row), axis=0)
+
+        #         if self._channels_first:
+        #             grid_obs = grid_obs.transpose(2, 0, 1).copy()
+
+        #         return grid_obs
+            
+        #     obs = self.render(
+        #         height=self._height,
+        #         width=self._width,
+        #         camera_id=self._camera_id
+        #     )
+
+        #     if self._channels_first:
+        #         obs = obs.transpose(2, 0, 1).copy()
+        # else:
+        #     obs = _flatten_obs(time_step.observation)
+        # return obs
 
     def _convert_action(self, action):
         action = action.astype(np.float64)
@@ -175,22 +204,26 @@ class DMCWrapper(core.Env):
         reward = 0
         extra = {'internal_state': self._env.physics.get_state().copy()}
 
+        breakpoint()
+
         for _ in range(self._frame_skip):
             time_step = self._env.step(action)
             reward += time_step.reward or 0
             done = time_step.last()
             if done:
                 break
-        obs = self._get_obs(time_step)
+        proprio_obs, img_obs = self._get_obs(time_step)
         self.current_state = _flatten_obs(time_step.observation)
         extra['discount'] = time_step.discount
-        return obs, reward, done, extra
+        breakpoint()
+        return proprio_obs, img_obs, reward, done, extra
 
     def reset(self):
         time_step = self._env.reset()
         self.current_state = _flatten_obs(time_step.observation)
-        obs = self._get_obs(time_step)
-        return obs
+        proprio_obs, img_obs = self._get_obs(time_step)
+        breakpoint()
+        return proprio_obs, img_obs
 
     def render(self, mode='rgb_array', height=None, width=None, camera_id=0):
         assert mode == 'rgb_array', 'only support rgb_array mode, given %s' % mode

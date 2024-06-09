@@ -53,16 +53,21 @@ if __name__ == '__main__':
     observations = []
 
     spec = env.action_spec()    # Environment specifications (range and shape of valid actions)
-    time_step = env.reset()
+    # breakpoint()
+    a, time_step = env.reset()
 
     while env.physics.data.time < duration: 
         action = random_state.uniform(spec.minimum, spec.maximum, spec.shape)
-        obs, reward, done, extra = env.step(action)
+        proprio_obs, img_obs, reward, done, extra = env.step(action)
+        # breakpoint()
 
-        frames.append(obs)
-        rewards.append(reward)
-        observations.append(copy.deepcopy(obs))
-        ticks.append(env.physics.data.time)
+        print("Proprio obs: ", proprio_obs)
+        print("Img obs: ", img_obs)
 
-    output_policy_video_filename = f'media/{domain_name}-{task_name}_result.mp4'
-    save_video(frames=frames, filename=output_policy_video_filename, framerate=30)
+    #     frames.append(obs)
+    #     rewards.append(reward)
+    #     observations.append(copy.deepcopy(obs))
+    #     ticks.append(env.physics.data.time)
+
+    # output_policy_video_filename = f'media/{domain_name}-{task_name}_result.mp4'
+    # save_video(frames=frames, filename=output_policy_video_filename, framerate=30)
